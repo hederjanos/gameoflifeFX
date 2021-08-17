@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hu.hj.gameoflifefx.controller.Controller">
+    <top>
+        <VBox alignment="CENTER" prefHeight="100.0" spacing="10">
+            <padding>
+                <Insets bottom="10" top="10" />
+            </padding>
+            <Label text="Game Of Life Simulation">
+                <font>
+                    <Font size="30.0" />
+                </font>
+            </Label>
+            <TextField fx:id="setDimensionField" alignment="CENTER" maxWidth="75" onKeyPressed="#handleSetDimensionKeyPressed" onKeyReleased="#handleSetDimensionKeyReleased" prefWidth="50" />
+            <Button fx:id="setDimensionButton" alignment="CENTER" onAction="#onSetDimensionButtonClicked" prefWidth="75" text="Set size"/>
+            <Label fx:id="setDimensionLabel" alignment="CENTER" prefWidth="400.0">
+                <font>
+                    <Font size="20.0"/>
+                </font>
+            </Label>
+            <HBox fx:id="counterBox" alignment="CENTER" spacing="10" BorderPane.alignment="CENTER">
+                <Label text="Number of steps:">
+                    <font>
+                        <Font size="20.0"/>
+                    </font>
+                <HBox.margin>
+                  <Insets left="200.0" />
+                </HBox.margin>
+                </Label>
+                <Label fx:id="counterLabel" prefWidth="200.0">
+                    <font>
+                        <Font size="20.0" />
+                    </font>
+                </Label>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <Pane fx:id="canvas" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+        </Pane>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER" spacing="10" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="resetButton" onAction="#reset" prefWidth="100" text="Reset" />
+                <Button fx:id="startButton" onAction="#start" prefWidth="100" text="Start" />
+                <Button fx:id="stopButton" onAction="#stop" prefWidth="100" text="Stop" />
+                <Button fx:id="stepButton" onAction="#step" prefWidth="100" text="Step" />
+            </children>
+        </HBox>
+    </bottom>
+    <padding>
+        <Insets bottom="10" left="10" right="10" top="10" />
+    </padding>
+</BorderPane>
