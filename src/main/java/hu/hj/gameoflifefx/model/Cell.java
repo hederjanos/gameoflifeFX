@@ -5,9 +5,9 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Cell {
+
     private final int x;
     private final int y;
-
     private final Set<Cell> neighbours;
 
     public Cell(int x, int y) {
@@ -15,7 +15,6 @@ public class Cell {
         this.y = y;
         this.neighbours = new HashSet<>();
     }
-
 
     public void setNeighbours() {
         for (Direction direction : Direction.values()) {

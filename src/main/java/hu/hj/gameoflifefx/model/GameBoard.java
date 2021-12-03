@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class GameBoard {
 
-    public Set<Cell> cells;
+    private Set<Cell> cells;
 
     public GameBoard() {
         this.cells = new HashSet<>();
@@ -84,7 +84,10 @@ public class GameBoard {
     }
 
     public void print() {
-        int minX, maxX, minY, maxY;
+        int minX;
+        int maxX;
+        int minY;
+        int maxY;
         minX = minY = Integer.MAX_VALUE;
         maxX = maxY = Integer.MIN_VALUE;
         for (Cell cell : this.cells) {

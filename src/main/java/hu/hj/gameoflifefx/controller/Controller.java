@@ -1,5 +1,6 @@
 package hu.hj.gameoflifefx.controller;
 
+import hu.hj.gameoflifefx.exception.DimensionException;
 import hu.hj.gameoflifefx.model.GameBoard;
 import hu.hj.gameoflifefx.simulation.Simulation;
 import javafx.event.ActionEvent;
@@ -18,7 +19,7 @@ public class Controller {
 
     private int dimension;
     private static final double CANVAS_SIZE = 500;
-    private static double CELL_SIZE;
+    private int cellSize;
     private GameBoard gameBoard;
     private Simulation simulation;
 
@@ -63,17 +64,17 @@ public class Controller {
         disableSimulationControlButtons(true, false, true, false);
     }
 
+    private void setVisibleCounterBox(boolean value) {
+        for (Node node : counterBox.getChildren()) {
+            node.setVisible(value);
+        }
+    }
+
     private void disableSimulationControlButtons(boolean reset, boolean start, boolean stop, boolean step) {
         resetButton.setDisable(reset);
         startButton.setDisable(start);
         stopButton.setDisable(stop);
         stepButton.setDisable(step);
-    }
-
-    private void setVisibleCounterBox(boolean value) {
-        for (Node node : counterBox.getChildren()) {
-            node.setVisible(value);
-        }
     }
 
     @FXML
@@ -82,28 +83,50 @@ public class Controller {
             try {
                 setDimensionLabel.setVisible(true);
                 clear();
-                dimension = Integer.parseInt(setDimensionField.getText());
-                CELL_SIZE = Math.ceil(CANVAS_SIZE / dimension);
-                this.canvas.setMaxSize(CELL_SIZE * dimension, CELL_SIZE * dimension);
-                setDimensionLabel.setText("Dimension has been set to " + setDimensionField.getText());
-                Thread wait = new Thread(() -> {
-                    try {
-                        Thread.sleep(2000);
-                        setDimensionLabel.setVisible(false);
-                        setVisibleCounterBox(true);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
-                wait.start();
-                setDimensionButton.setDisable(true);
-                initializeCanvas();
-                updateCanvas();
-            } catch (NumberFormatException nfe) {
+                parseDimension();
+                calculateCellSize();
+                displayInfos();
+                prepareForSimulation();
+            } catch (NumberFormatException | DimensionException e) {
                 canvas.getChildren().removeAll();
-                setDimensionLabel.setText("Add a number!");
+                setDimensionLabel.setText("Add a whole number between 5 and 50!");
             }
         }
+    }
+
+    private void parseDimension() throws DimensionException {
+        int input = Integer.parseInt(setDimensionField.getText());
+        if (input < 5 || input > 50) {
+            throw new DimensionException();
+        } else {
+            dimension = input;
+        }
+    }
+
+    private void calculateCellSize() {
+        cellSize = (int) CANVAS_SIZE / dimension;
+        this.canvas.setMaxSize((double) cellSize * dimension, (double) cellSize * dimension);
+    }
+
+    private void displayInfos() {
+        setDimensionLabel.setText("Dimension has been set to " + setDimensionField.getText());
+        Thread wait = new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                setDimensionLabel.setVisible(false);
+                setVisibleCounterBox(true);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                e.printStackTrace();
+            }
+        });
+        wait.start();
+    }
+
+    private void prepareForSimulation() {
+        setDimensionButton.setDisable(true);
+        initializeCanvas();
+        updateCanvas();
     }
 
     public void clear() {
@@ -121,9 +144,9 @@ public class Controller {
     public void initializeCanvas() {
         if (dimension != 0) {
             grid = new Rectangle[dimension][dimension];
-            for (int i = 0; i < CANVAS_SIZE; i += CELL_SIZE) {
-                for (int j = 0; j < CANVAS_SIZE; j += CELL_SIZE) {
-                    Rectangle rectangle = createRectangle(i, j);
+            for (int i = 0; i < dimension; i++) {
+                for (int j = 0; j < dimension; j++) {
+                    Rectangle rectangle = createRectangle(i * cellSize, j * cellSize);
                     canvas.getChildren().add(rectangle);
                 }
             }
@@ -131,8 +154,8 @@ public class Controller {
     }
 
     private Rectangle createRectangle(int i, int j) {
-        Rectangle rectangle = new Rectangle(i, j, CELL_SIZE, CELL_SIZE);
-        grid[(int) (i / CELL_SIZE)][(int) (j / CELL_SIZE)] = rectangle;
+        Rectangle rectangle = new Rectangle(i, j, cellSize, cellSize);
+        grid[i / cellSize][j / cellSize] = rectangle;
         rectangle.setOnMouseClicked(this::handleOnRectangleClicked);
         return rectangle;
     }
@@ -170,8 +193,8 @@ public class Controller {
 
     @FXML
     private void handleOnRectangleClicked(MouseEvent event) {
-        int x = (int) (event.getX() / CELL_SIZE);
-        int y = (int) (event.getY() / CELL_SIZE);
+        int x = (int) (event.getX() / cellSize);
+        int y = (int) (event.getY() / cellSize);
         if (gameBoard.isCellAlive(x, y)) {
             gameBoard.removeCell(x, y);
         } else {
@@ -181,13 +204,13 @@ public class Controller {
     }
 
     @FXML
-    public void start(ActionEvent actionEvent) {
+    public void start() {
         simulation.start();
         disableSimulationControlButtons(false, true, false, true);
     }
 
     @FXML
-    public void stop(ActionEvent actionEvent) {
+    public void stop() {
         if (simulation != null) {
             simulation.stop();
             disableSimulationControlButtons(false, false, true, false);
@@ -195,11 +218,7 @@ public class Controller {
     }
 
     @FXML
-    public void reset(ActionEvent actionEvent) {
-        reset();
-    }
-
-    private void reset() {
+    public void reset() {
         if (simulation != null) {
             simulation.reset();
             counterLabel.textProperty().bind(simulation.counterProperty().asString());
@@ -208,7 +227,7 @@ public class Controller {
     }
 
     @FXML
-    public void step(ActionEvent actionEvent) {
+    public void step() {
         increaseCounter();
         gameBoard.nextGeneration();
         updateCanvas();
@@ -218,5 +237,4 @@ public class Controller {
     private void increaseCounter() {
         simulation.counterProperty().setValue(simulation.counterProperty().getValue() + 1);
     }
-
 }

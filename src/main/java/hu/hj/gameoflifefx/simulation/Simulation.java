@@ -11,6 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Simulation {
+
     private static final int SLEEP_MSEC = 200;
     private final IntegerProperty counter = new SimpleIntegerProperty(0);
     private final GameBoard gameBoard;
@@ -28,19 +29,11 @@ public class Simulation {
 
     public void start() {
         stop();
-        Runnable gotoNextGenerationTask = new Runnable() {
-            @Override
-            public void run() {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        gameBoard.nextGeneration();
-                        controller.updateCanvas();
-                        counter.setValue(counter.getValue() + 1);
-                    }
-                });
-            }
-        };
+        Runnable gotoNextGenerationTask = () -> Platform.runLater(() -> {
+            gameBoard.nextGeneration();
+            controller.updateCanvas();
+            counter.setValue(counter.getValue() + 1);
+        });
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(gotoNextGenerationTask, 0, SLEEP_MSEC, TimeUnit.MILLISECONDS);
     }
