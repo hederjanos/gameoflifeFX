@@ -11,4 +11,4 @@ You can start, stop, reset and step the simulation. You can reset the simulation
 
 # screenshot:
 
-https://github.com/hederjanos/gameoflifeFX/blob/master/gameoflife.gif
+https://github.com/hederjanos/gameoflifeFX/blob/master/gameoflife.png
